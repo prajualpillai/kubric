@@ -1,6 +1,7 @@
 import requests
 import pandas
 import scipy
+from scipy import stats
 import numpy
 import sys
 
@@ -18,6 +19,23 @@ def predict_price(area) -> float:
     response = requests.get(TRAIN_DATA_URL)
     # YOUR IMPLEMENTATION HERE
     ...
+    con = response.content
+    f = open('train.csv','wb')
+    f.write(con)
+    f.close()
+    df = pandas.read_csv("train.csv",header = None)
+    df = df.T
+    head = df.iloc[0]
+    df = df.drop([0],axis = 0)
+    df.columns = head
+    x = numpy.asarray(df["area"]).astype('float')
+    y = numpy.asarray(df["price"]).astype('float')
+    
+    b1,b0,_,_,_ = stats.linregress(x,y)
+    y_pred = b0 + b1*area
+    
+    return y_pred
+    
 
 
 if __name__ == "__main__":
